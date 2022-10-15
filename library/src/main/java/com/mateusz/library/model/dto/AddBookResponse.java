@@ -5,12 +5,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class GetBookResponse {
-
-    private long id;
+public class AddBookResponse {
 
     private String title;
-
-    private String author;
-
 }

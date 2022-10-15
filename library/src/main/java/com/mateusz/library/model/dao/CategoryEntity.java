@@ -13,5 +13,5 @@ public class CategoryEntity {
 
     private String name;
 
-    private List<BookEntity> listOfBooks;
+//    private List<BookEntity> listOfBooks;
 }

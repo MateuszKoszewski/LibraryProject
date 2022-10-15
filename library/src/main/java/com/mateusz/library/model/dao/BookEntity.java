@@ -22,10 +22,11 @@ public class BookEntity {
 
     private boolean present;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    private UserEntity user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
-    private List<CategoryEntity> categoriesList;
+//    private List<CategoryEntity> categoriesList;
 
     private BigDecimal price;
 
