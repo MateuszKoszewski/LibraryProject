@@ -1,6 +1,7 @@
 package com.mateusz.library.security;
 
 import com.mateusz.library.model.dao.UserEntity;
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
-
+@AllArgsConstructor
 public class UserPrincipal implements UserDetails {
 
     private UserEntity userEntity;
@@ -25,7 +26,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.userEntity.getLogin();
+        return this.userEntity.getUsername();
     }
 
     @Override

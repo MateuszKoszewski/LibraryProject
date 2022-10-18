@@ -3,9 +3,9 @@ package com.mateusz.library.model.dao;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -25,7 +25,7 @@ public class UserEntity {
 
     private String email;
 
-    private String login;
+    private String username;
 
     private String password;
 
@@ -38,6 +38,10 @@ public class UserEntity {
     private boolean isNotLocked;
 
     private boolean isActive;
+
+    private Date lastLoginDate;
+
+    private Date lastLoginDateDisplay;
 
     private String[] roles;
 

@@ -1,5 +1,6 @@
 package com.mateusz.library.controllers;
 
+import com.mateusz.library.exception.ExceptionHandling;
 import com.mateusz.library.model.dto.AddUserRequest;
 import com.mateusz.library.model.dto.AddUserResponse;
 import com.mateusz.library.model.dto.GetUserResponse;
@@ -11,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-public class UserController {
+public class UserController extends ExceptionHandling {
 
     private final UserService userService;
 

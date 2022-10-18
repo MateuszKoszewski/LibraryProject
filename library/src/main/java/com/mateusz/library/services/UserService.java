@@ -7,18 +7,26 @@ import com.mateusz.library.model.dto.AddUserResponse;
 import com.mateusz.library.model.dto.GetBookResponse;
 import com.mateusz.library.model.dto.GetUserResponse;
 import com.mateusz.library.repositories.UserRepository;
+import com.mateusz.library.security.UserPrincipal;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class UserService {
+public class UserService implements UserDetailsService {
 
+    private Logger LOGGER = LoggerFactory.getLogger(getClass());
     private final UserRepository userRepository;
 
     public List<GetUserResponse> getAllUsers() {
@@ -59,5 +67,21 @@ public class UserService {
                 .lastName(userEntity.getLastName())
                 .listOfBooks(mapBookEntityToGetBookResponse(userEntity.getRentedBooks()))
                 .build();
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserEntity userEntity = userRepository.findUserByUsername(username);
+        if (userEntity == null){
+            LOGGER.error("User not found by login: " + username);
+            throw new UsernameNotFoundException("User not found by login: " + username);
+        } else {
+            userEntity.setLastLoginDateDisplay(userEntity.getLastLoginDate());
+            userEntity.setLastLoginDate(new Date());
+            userRepository.save(userEntity);
+            UserPrincipal userPrincipal = new UserPrincipal(userEntity);
+            LOGGER.info("Returning found user by login: " + username);
+            return userPrincipal;
+        }
     }
 }
