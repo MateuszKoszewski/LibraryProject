@@ -41,7 +41,7 @@ private final UserRepository userRepository;
 
     public AddBookResponse rentBook(String userEmail, String bookTitle) {
         BookEntity bookEntity = bookRepository.findByTitle(bookTitle);
-        UserEntity userEntity = userRepository.findByEmail(userEmail);
+        UserEntity userEntity = userRepository.findUserByEmail(userEmail);
         userEntity.getRentedBooks().add(bookEntity);
         bookEntity.setUser(userEntity);
         return AddBookResponse.builder().title(bookTitle).build();

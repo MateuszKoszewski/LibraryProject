@@ -1,6 +1,7 @@
 package com.mateusz.library.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mateusz.library.constants.SecurityConstants;
 import com.mateusz.library.exception.httpExceptionHandling.HttpResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

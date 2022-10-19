@@ -1,5 +1,6 @@
 package com.mateusz.library.security;
 
+import com.mateusz.library.constants.SecurityConstants;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

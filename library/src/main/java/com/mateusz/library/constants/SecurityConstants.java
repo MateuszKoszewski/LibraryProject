@@ -1,4 +1,4 @@
-package com.mateusz.library.security;
+package com.mateusz.library.constants;
 
 public class SecurityConstants {
 
@@ -12,6 +12,6 @@ public class SecurityConstants {
     public static final String FORBIDDEN_MESSAGE = "You need to log in to access this page";
     public static final String ACCESS_DENIED_MESSAGE = "You do not have permission to access this page";
     public static final String OPTIONS_HTTP_METHOD = "OPTIONS";
-    public static final String[] PUBLIC_URLS = {"/api/user/login", "api/user/register", "api/user/resetpassword/**"};
+    public static final String[] PUBLIC_URLS = {"/api/user/login", "/api/user/register", "api/user/resetpassword/**", "/api/home", "/login", "/register"};
 
 }

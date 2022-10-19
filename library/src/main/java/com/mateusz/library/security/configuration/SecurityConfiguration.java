@@ -3,7 +3,7 @@ package com.mateusz.library.security.configuration;
 import com.mateusz.library.exception.httpExceptionHandling.JwtAuthenticationEntryPoint;
 import com.mateusz.library.security.JWTAuthorizationFilter;
 import com.mateusz.library.security.JwtAccessDeniedHandler;
-import com.mateusz.library.security.SecurityConstants;
+import com.mateusz.library.constants.SecurityConstants;
 import com.mateusz.library.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -57,7 +57,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
     @Override
-    public AuthenticationManager authenticationManager() throws Exception {
+    public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 }
