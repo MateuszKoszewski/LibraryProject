@@ -25,6 +25,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -55,7 +56,7 @@ public class UserController extends ExceptionHandling {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserEntity> register(@RequestBody UserEntity userEntity) throws UserNotFoundException, UsernameExistsException, EmailExistsException {
+    public ResponseEntity<UserEntity> register(@RequestBody @Valid UserEntity userEntity) throws UserNotFoundException, UsernameExistsException, EmailExistsException {
         UserEntity newUser = userService.register(userEntity.getFirstName(), userEntity.getLastName(), userEntity.getUsername(), userEntity.getEmail(), userEntity.getPassword());
         return new ResponseEntity<>(newUser, HttpStatus.OK);
     }

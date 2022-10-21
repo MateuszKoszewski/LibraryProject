@@ -4,8 +4,13 @@ import com.mateusz.library.constants.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
 
@@ -24,10 +29,15 @@ public class UserEntity {
 
     private String lastName;
 
+    @Email
     private String email;
 
+    @NotNull
+    @Size(min=2, message = "username must have at least 2 characters")
     private String username;
 
+    @NotNull(message = "password cannot be empty")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{6,20}$", message = "password must contain at least one digit, one lowercase character, one uppercase character and must have 6-20 characters")
     private String password;
 
     @OneToMany(

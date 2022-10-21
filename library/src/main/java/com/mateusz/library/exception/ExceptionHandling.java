@@ -6,6 +6,7 @@ import com.mateusz.library.exception.domain.EmailNotFoundException;
 import com.mateusz.library.exception.domain.UserNotFoundException;
 import com.mateusz.library.exception.domain.UsernameExistsException;
 import com.mateusz.library.exception.httpExceptionHandling.HttpResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
@@ -16,10 +17,12 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.persistence.NoResultException;
+import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -92,6 +95,18 @@ public class ExceptionHandling {
     public ResponseEntity<HttpResponse> internalServerErrorException(Exception exception) {
         LOGGER.error(exception.getMessage());
         return createHttpResponse(INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR_MSG);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<HttpResponse> illegalArgumentErrorException(IllegalArgumentException exception) {
+        LOGGER.error(exception.getMessage());
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<HttpResponse> validationException(MethodArgumentNotValidException exception) {
+        LOGGER.error(exception.getMessage());
+        return createHttpResponse(BAD_REQUEST, exception.getBindingResult().getFieldError().getDefaultMessage());
     }
 
     @ExceptionHandler(NoResultException.class)
