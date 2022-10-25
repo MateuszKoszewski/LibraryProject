@@ -12,18 +12,19 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping(path = "/api/book")
 public class BookController {
 
     private final BookService bookService;
 
-    @GetMapping("/api/getAllBooks")
+    @GetMapping("/getAllBooks")
     public List<GetBookResponse> getAllBooks() {
         return bookService.getAllBooks();
     }
 
-    @PostMapping("/api/book")
-    public AddBookResponse addBook(@RequestBody AddBookRequest addBookRequest) {
-        return bookService.addBook(addBookRequest);
+    @PostMapping("/addBook")
+    public BookEntity addBook(@RequestBody BookEntity bookEntity) {
+        return bookService.addBook(bookEntity.getTitle(), bookEntity.getAuthor(), bookEntity.getCategoriesList(), bookEntity.getPrice());
     }
 @PostMapping("/api/rentBook")
     public AddBookResponse rentBook(@RequestParam("userEmail") String userEmail, @RequestParam("bookTitle") String bookTitle){

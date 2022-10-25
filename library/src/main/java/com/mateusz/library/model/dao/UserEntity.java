@@ -1,5 +1,6 @@
 package com.mateusz.library.model.dao;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mateusz.library.constants.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,7 +24,7 @@ public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     private String firstName;
 
@@ -37,7 +38,7 @@ public class UserEntity {
     private String username;
 
     @NotNull(message = "password cannot be empty")
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{6,20}$", message = "password must contain at least one digit, one lowercase character, one uppercase character and must have 6-20 characters")
+//    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{6,20}$", message = "password must contain at least one digit, one lowercase character, one uppercase character and must have 6-20 characters")
     private String password;
 
     @OneToMany(
@@ -62,6 +63,7 @@ public class UserEntity {
             joinColumns = @JoinColumn (name = "user_id"),
             inverseJoinColumns = @JoinColumn (name = "role_id")
     )
+
     private List<RoleEntity> roles;
 
     private String[] authorities;

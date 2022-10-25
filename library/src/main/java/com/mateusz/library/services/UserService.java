@@ -19,16 +19,23 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -93,7 +100,7 @@ public class UserService implements UserDetailsService {
             userEntity.setLastLoginDate(new Date());
             userRepository.save(userEntity);
             UserPrincipal userPrincipal = new UserPrincipal(userEntity);
-            LOGGER.info("Returning found user by login: " + username);
+            LOGGER.info("Returning found user by username: " + username);
             return userPrincipal;
         }
     }
@@ -127,7 +134,23 @@ public class UserService implements UserDetailsService {
     public UserEntity findUserByEmail (String email) {
         return userRepository.findUserByEmail(email);
     }
+@PreAuthorize("authentication.principal.equals(#username)")
+    public UserEntity deleteUser(String username){
+        UserEntity userToDelete = userRepository.findUserByUsername(username);
+        userRepository.delete(userToDelete);
+        return null;
+    }
 
+    public UserEntity deleteUserById(Long userId) {
+        UserEntity userToDelete = userRepository.findById(userId).orElseThrow(()-> new NoResultException("specified User doesn't exist in DB"));
+        if (!operationIsAllowed(userToDelete)) {
+
+            LOGGER.error("unauthorized user: " + SecurityContextHolder.getContext().getAuthentication().getPrincipal() + " tried to delete user: " + userToDelete.getUsername());
+            throw new AccessDeniedException("access denied");
+        }
+        userRepository.delete(userToDelete);
+        return null;
+    }
     private UserEntity validateNewUsernameAndEmail(String currentUsername, String newUsername, String newEmail) throws UserNotFoundException, UsernameExistsException, EmailExistsException {
         UserEntity userByUsername = findUserByUsername(newUsername);
         UserEntity userByEmail = findUserByUsername(newEmail);
@@ -158,5 +181,10 @@ public class UserService implements UserDetailsService {
         List<RoleEntity> listOfRoles = new ArrayList<>();
         listOfRoles.add(rolesRepository.findRoleEntityByRoleEnum(Role.ROLE_USER));
         return listOfRoles;
+    }
+
+    private boolean operationIsAllowed(UserEntity userEntity) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getPrincipal().equals(userEntity.getUsername()) || authentication.getPrincipal().equals("admin");
     }
 }

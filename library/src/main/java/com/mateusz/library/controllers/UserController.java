@@ -70,6 +70,18 @@ public class UserController extends ExceptionHandling {
         return new ResponseEntity<>(loginUser, jwtHeader, HttpStatus.OK);
     }
 
+    @DeleteMapping("/deleteByUsername/{username}")
+    public ResponseEntity<UserEntity> deleteUserByUsername(@PathVariable(name = "username") String username){
+        UserEntity deletedUser = userService.deleteUser(username);
+        return new ResponseEntity<>(deletedUser, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/deleteById/{userId}")
+    public ResponseEntity<UserEntity> deleteUserById(@PathVariable(name = "userId") Long userId){
+        UserEntity deletedUser = userService.deleteUserById(userId);
+        return new ResponseEntity<>(deletedUser, HttpStatus.OK);
+    }
+
     private HttpHeaders getJwtHeader(UserPrincipal userPrincipal) {
         HttpHeaders header = new HttpHeaders();
         header.add(SecurityConstants.JWT_TOKEN_HEADER, jwtTokenProvider.generateJwtToken(userPrincipal));
