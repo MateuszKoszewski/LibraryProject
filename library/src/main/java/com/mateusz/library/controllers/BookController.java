@@ -26,6 +26,18 @@ public class BookController {
     public BookEntity addBook(@RequestBody BookEntity bookEntity) {
         return bookService.addBook(bookEntity.getTitle(), bookEntity.getAuthor(), bookEntity.getCategoriesList(), bookEntity.getPrice());
     }
+    @GetMapping("/getById/{bookId}")
+    public BookEntity getBookById(@PathVariable(name = "bookId")Long bookId) {
+        return bookService.getBookById(bookId);
+    }
+    @GetMapping("/getByTitle/{bookTitle}")
+    public List<BookEntity> getBookByTitle(@PathVariable(name = "bookTitle")String bookTitle) {
+        return bookService.getBookByTitle(bookTitle);
+    }
+    @GetMapping("/search")
+    public List<BookEntity> searchBook(@RequestBody BookEntity bookEntity){
+        return bookService.searchBook(bookEntity);
+    }
 @PostMapping("/api/rentBook")
     public AddBookResponse rentBook(@RequestParam("userEmail") String userEmail, @RequestParam("bookTitle") String bookTitle){
         return bookService.rentBook(userEmail, bookTitle);
