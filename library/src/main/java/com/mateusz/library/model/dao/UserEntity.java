@@ -2,22 +2,21 @@ package com.mateusz.library.model.dao;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mateusz.library.constants.Role;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserEntity {
@@ -43,9 +42,14 @@ public class UserEntity {
 
     @OneToMany(
             cascade = CascadeType.ALL,
-            mappedBy = "user",
+            mappedBy = "currentUser",
             orphanRemoval = true)
     private List<BookEntity> rentedBooks;
+
+//    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
+//    private List<HistoryOfBookEntity> historyOfBooks;
+
+    private BigDecimal accountBalance;
 
     private boolean isNotLocked;
 
@@ -63,7 +67,6 @@ public class UserEntity {
             joinColumns = @JoinColumn (name = "user_id"),
             inverseJoinColumns = @JoinColumn (name = "role_id")
     )
-
     private List<RoleEntity> roles;
 
     private String[] authorities;

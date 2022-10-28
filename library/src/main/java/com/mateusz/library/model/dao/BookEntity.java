@@ -1,5 +1,6 @@
 package com.mateusz.library.model.dao;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import org.hibernate.engine.spi.CascadingAction;
@@ -24,12 +25,21 @@ public class BookEntity {
 
     private boolean present;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
-    private UserEntity user;
+    private UserEntity currentUser;
 
+//    @JsonIgnore
+//    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+//    @JoinTable(
+//            name = "books_users",
+//            joinColumns = @JoinColumn(name = "book_id"),
+//            inverseJoinColumns = @JoinColumn(name = "user_id")
+//    )
+//    @OneToMany(mappedBy = "bookEntity", cascade = CascadeType.ALL)
+//    private List<HistoryOfBookEntity> historyOfUsers;
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-//    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "books_categories",
             joinColumns = @JoinColumn(name = "book_id"),

@@ -1,6 +1,7 @@
 package com.mateusz.library.controllers;
 
 import com.mateusz.library.model.dao.BookEntity;
+import com.mateusz.library.model.dao.UserEntity;
 import com.mateusz.library.model.dto.AddBookRequest;
 import com.mateusz.library.model.dto.AddBookResponse;
 import com.mateusz.library.model.dto.GetBookResponse;
@@ -22,6 +23,10 @@ public class BookController {
         return bookService.getAllBooks();
     }
 
+    @GetMapping("/getAllRentedBooks")
+    public List<BookEntity> getAllRentedBooks() {
+        return bookService.getAllRentedBooks();
+    }
     @PostMapping("/addBook")
     public BookEntity addBook(@RequestBody BookEntity bookEntity) {
         return bookService.addBook(bookEntity.getTitle(), bookEntity.getAuthor(), bookEntity.getCategoriesList(), bookEntity.getPrice());
@@ -38,9 +43,13 @@ public class BookController {
     public List<BookEntity> searchBook(@RequestBody BookEntity bookEntity){
         return bookService.searchBook(bookEntity);
     }
-@PostMapping("/api/rentBook")
-    public AddBookResponse rentBook(@RequestParam("userEmail") String userEmail, @RequestParam("bookTitle") String bookTitle){
-        return bookService.rentBook(userEmail, bookTitle);
+@PostMapping("/rentBook/{bookTitle}")
+    public BookEntity rentBook(@PathVariable(name = "bookTitle") String bookTitle){
+        return bookService.rentBook(bookTitle);
     }
+@GetMapping("/{bookId}")
+    public UserEntity getBookOwnerByBookId(@PathVariable(name = "bookId")Long bookId) {
+        return bookService.getBookOwnerByBookId(bookId);
+}
 
 }

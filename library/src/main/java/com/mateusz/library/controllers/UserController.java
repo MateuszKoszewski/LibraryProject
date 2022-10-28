@@ -5,23 +5,21 @@ import com.mateusz.library.exception.ExceptionHandling;
 import com.mateusz.library.exception.domain.EmailExistsException;
 import com.mateusz.library.exception.domain.UserNotFoundException;
 import com.mateusz.library.exception.domain.UsernameExistsException;
+import com.mateusz.library.model.dao.BookEntity;
 import com.mateusz.library.model.dao.UserEntity;
 import com.mateusz.library.model.dto.AddUserRequest;
 import com.mateusz.library.model.dto.AddUserResponse;
 import com.mateusz.library.model.dto.GetUserResponse;
+import com.mateusz.library.model.dto.HistoryOfBookForUserResponse;
 import com.mateusz.library.security.JWTTokenProvider;
 import com.mateusz.library.security.UserPrincipal;
 import com.mateusz.library.services.UserService;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
@@ -80,6 +78,28 @@ public class UserController extends ExceptionHandling {
     public ResponseEntity<UserEntity> deleteUserById(@PathVariable(name = "userId") Long userId){
         UserEntity deletedUser = userService.deleteUserById(userId);
         return new ResponseEntity<>(deletedUser, HttpStatus.OK);
+    }
+
+    @GetMapping("/getCurrentlyRentedBooks")
+    public ResponseEntity<List<BookEntity>> getCurrentlyRentedBooks() {
+        List<BookEntity> rentedBooks = userService.getCurrentlyRentedBooks();
+        return new ResponseEntity<>(rentedBooks, HttpStatus.OK);
+    }
+    @GetMapping("/getMyHistory")
+    public ResponseEntity<List<HistoryOfBookForUserResponse>> getMyHistory() {
+        List<HistoryOfBookForUserResponse> myHistory = userService.getMyHistory();
+        return new ResponseEntity<>(myHistory, HttpStatus.OK);
+    }
+    @GetMapping("/getUserHistoryById/{userId}")
+    public ResponseEntity<List<HistoryOfBookForUserResponse>> getUserHistoryById(@PathVariable(name = "userId")Long userId) {
+        List<HistoryOfBookForUserResponse> userHistory = userService.getUserHistoryById(userId);
+        return new ResponseEntity<>(userHistory, HttpStatus.OK);
+    }
+
+    @GetMapping("/getUserHistoryByUsername/{username}")
+    public ResponseEntity<List<HistoryOfBookForUserResponse>> getUserHistoryByUsername(@PathVariable(name = "username")String username) {
+        List<HistoryOfBookForUserResponse> userHistory = userService.getUserHistoryByUsername(username);
+        return new ResponseEntity<>(userHistory, HttpStatus.OK);
     }
 
     private HttpHeaders getJwtHeader(UserPrincipal userPrincipal) {

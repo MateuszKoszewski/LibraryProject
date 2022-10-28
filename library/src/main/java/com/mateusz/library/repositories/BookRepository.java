@@ -12,6 +12,10 @@ import java.util.List;
 public interface BookRepository extends JpaRepository<BookEntity, Long> {
 
     List<BookEntity> findByTitle (String title);
+
+    List<BookEntity> findByPresentIsFalse();
+
+    List<BookEntity> findByTitleAndPresentIsTrue(String title);
     List<BookEntity> findByCategoriesList_name(String categoryName);
 
     List<BookEntity> findByCategoriesList(CategoryEntity categoryEntity);

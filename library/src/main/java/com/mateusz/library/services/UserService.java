@@ -1,6 +1,7 @@
 package com.mateusz.library.services;
 
 import com.mateusz.library.constants.Role;
+import com.mateusz.library.model.dao.HistoryOfBookEntity;
 import com.mateusz.library.model.dao.RoleEntity;
 import com.mateusz.library.constants.UserServiceConstants;
 import com.mateusz.library.exception.domain.EmailExistsException;
@@ -8,10 +9,8 @@ import com.mateusz.library.exception.domain.UserNotFoundException;
 import com.mateusz.library.exception.domain.UsernameExistsException;
 import com.mateusz.library.model.dao.BookEntity;
 import com.mateusz.library.model.dao.UserEntity;
-import com.mateusz.library.model.dto.AddUserRequest;
-import com.mateusz.library.model.dto.AddUserResponse;
-import com.mateusz.library.model.dto.GetBookResponse;
-import com.mateusz.library.model.dto.GetUserResponse;
+import com.mateusz.library.model.dto.*;
+import com.mateusz.library.repositories.HistoryOfBooksRepository;
 import com.mateusz.library.repositories.RolesRepository;
 import com.mateusz.library.repositories.UserRepository;
 import com.mateusz.library.security.UserPrincipal;
@@ -20,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,7 +33,6 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,6 +44,8 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
 
     private final RolesRepository rolesRepository;
+
+    private final HistoryOfBooksRepository historyOfBooksRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public List<GetUserResponse> getAllUsers() {
@@ -151,6 +150,30 @@ public class UserService implements UserDetailsService {
         userRepository.delete(userToDelete);
         return null;
     }
+
+    public List<BookEntity> getCurrentlyRentedBooks() {
+        String currentlyLoggedInUsername = getCurrentlyLoggedInUsername();
+        UserEntity currentUser = userRepository.findUserByUsername(currentlyLoggedInUsername);
+        return currentUser.getRentedBooks();
+    }
+
+    public List<HistoryOfBookForUserResponse> getMyHistory() {
+        String currentlyLoggedUsername = getCurrentlyLoggedInUsername();
+        return mapHistoryOfBooks(historyOfBooksRepository.findByUserEntity_username(currentlyLoggedUsername));
+    }
+
+    public List<HistoryOfBookForUserResponse> getUserHistoryById(Long userId) {
+        return mapHistoryOfBooks(historyOfBooksRepository.findByUserEntity_id(userId));
+    }
+
+    public List<HistoryOfBookForUserResponse> getUserHistoryByUsername(String username) {
+        return mapHistoryOfBooks(historyOfBooksRepository.findByUserEntity_username(username));
+    }
+
+    private List<HistoryOfBookForUserResponse> mapHistoryOfBooks(List<HistoryOfBookEntity> historyOfBooksByUsername) {
+        return historyOfBooksByUsername.stream().map(historyOfBook -> new HistoryOfBookForUserResponse(historyOfBook.getBookEntity())).collect(Collectors.toList());
+    }
+
     private UserEntity validateNewUsernameAndEmail(String currentUsername, String newUsername, String newEmail) throws UserNotFoundException, UsernameExistsException, EmailExistsException {
         UserEntity userByUsername = findUserByUsername(newUsername);
         UserEntity userByEmail = findUserByUsername(newEmail);
@@ -184,7 +207,16 @@ public class UserService implements UserDetailsService {
     }
 
     private boolean operationIsAllowed(UserEntity userEntity) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication.getPrincipal().equals(userEntity.getUsername()) || authentication.getPrincipal().equals("admin");
+        Authentication authentication = getAuthentication();
+            return authentication.getPrincipal().equals(userEntity.getUsername()) || authentication.getPrincipal().equals("admin");
+    }
+
+    private Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    private String getCurrentlyLoggedInUsername() {
+        Authentication authentication = getAuthentication();
+        return authentication.getPrincipal().toString();
     }
 }
