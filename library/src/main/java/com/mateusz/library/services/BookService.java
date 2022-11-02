@@ -1,14 +1,9 @@
 package com.mateusz.library.services;
 
-import com.mateusz.library.model.dao.BookEntity;
-import com.mateusz.library.model.dao.CategoryEntity;
-import com.mateusz.library.model.dao.HistoryOfBookEntity;
-import com.mateusz.library.model.dao.UserEntity;
+import com.mateusz.library.constants.NotificationMessages;
+import com.mateusz.library.model.dao.*;
 import com.mateusz.library.model.dto.GetBookResponse;
-import com.mateusz.library.repositories.BookRepository;
-import com.mateusz.library.repositories.CategoryRepository;
-import com.mateusz.library.repositories.HistoryOfBooksRepository;
-import com.mateusz.library.repositories.UserRepository;
+import com.mateusz.library.repositories.*;
 import com.mateusz.library.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +32,8 @@ private final UserRepository userRepository;
 private final CategoryRepository categoryRepository;
 
 private final HistoryOfBooksRepository historyOfBooksRepository;
+
+private final NotificationRepository notificationRepository;
 
 
     public List<GetBookResponse> getAllBooks() {
@@ -138,15 +135,26 @@ private final HistoryOfBooksRepository historyOfBooksRepository;
                 .findFirst()
                 .orElseThrow(() -> new NoResultException("book is not available"));
         bookToRent.setPresent(false);
-        bookToRent.setCurrentUser(loggedUser);
+        loggedUser.addRentedBook(bookToRent);
+//        bookToRent.setCurrentUser(loggedUser);
         bookToRent.setDateOfRent(DateUtils.parseDateToLocalDate(new Date()));
-        loggedUser.getRentedBooks().add(bookToRent);
+//        loggedUser.getRentedBooks().add(bookToRent);
+        createNotification(loggedUser, bookToRent, NotificationMessages.USER_HAS_RENTED_BOOK, bookToRent.getTitle());
 //        createHistoryOfBookEntity(loggedUser, bookToRent);
         return null;
     }
 
-    public BookEntity returnBook(BookEntity bookEntity) {
-
+    public BookEntity returnBook(String title) {
+        UserEntity loggedUser = getLoggedUser();
+        BookEntity bookToReturn = bookRepository.findByCurrentUserAndTitle(loggedUser, title).orElseThrow(() -> new NoResultException("book doesn't exist"));
+        bookToReturn.setPresent(true);
+        bookToReturn.setCurrentUser(null);
+        bookToReturn.setDateOfReturn(DateUtils.parseDateToLocalDate(new Date()));
+        createHistoryOfBookEntity(loggedUser, bookToReturn);
+        bookToReturn.setDateOfRent(null);
+        bookToReturn.setDateOfReturn(null);
+        createNotification(loggedUser, bookToReturn, NotificationMessages.USER_HAS_RETURNED_BOOK, bookToReturn.getTitle());
+        return bookToReturn;
     }
     @PreAuthorize("hasAuthority('user:delete')")
     public UserEntity getBookOwnerByBookId(Long bookId) {
@@ -154,12 +162,11 @@ private final HistoryOfBooksRepository historyOfBooksRepository;
        return book.getCurrentUser();
     }
 
-    private HistoryOfBookEntity createHistoryOfBookEntity(UserEntity loggedUser, BookEntity bookToRent) {
+    private void createHistoryOfBookEntity(UserEntity loggedUser, BookEntity bookToRent) {
     HistoryOfBookEntity historyOfBookEntity = new HistoryOfBookEntity();
     historyOfBookEntity.setBookEntity(bookToRent);
     historyOfBookEntity.setUserEntity(loggedUser);
     historyOfBooksRepository.save(historyOfBookEntity);
-    return historyOfBookEntity;
     }
 
 
@@ -167,5 +174,15 @@ private final HistoryOfBooksRepository historyOfBooksRepository;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getPrincipal().toString();
         return userRepository.findUserByUsername(username);
+    }
+
+    private void createNotification(UserEntity userEntity, BookEntity bookEntity, String message, String attribute) {
+        NotificationEntity notification = new NotificationEntity();
+        notification.setBookEntity(bookEntity);
+//        notification.setUserEntity(userEntity);
+        userEntity.addNotification(notification);
+        notification.setMessage(String.format(message, attribute));
+        notification.setAlreadyRead(false);
+        notificationRepository.save(notification);
     }
 }

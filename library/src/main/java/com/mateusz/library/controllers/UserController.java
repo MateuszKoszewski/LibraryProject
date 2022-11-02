@@ -6,6 +6,7 @@ import com.mateusz.library.exception.domain.EmailExistsException;
 import com.mateusz.library.exception.domain.UserNotFoundException;
 import com.mateusz.library.exception.domain.UsernameExistsException;
 import com.mateusz.library.model.dao.BookEntity;
+import com.mateusz.library.model.dao.NotificationEntity;
 import com.mateusz.library.model.dao.UserEntity;
 import com.mateusz.library.model.dto.AddUserRequest;
 import com.mateusz.library.model.dto.AddUserResponse;
@@ -100,6 +101,24 @@ public class UserController extends ExceptionHandling {
     public ResponseEntity<List<HistoryOfBookForUserResponse>> getUserHistoryByUsername(@PathVariable(name = "username")String username) {
         List<HistoryOfBookForUserResponse> userHistory = userService.getUserHistoryByUsername(username);
         return new ResponseEntity<>(userHistory, HttpStatus.OK);
+    }
+
+    @GetMapping("/getAllNotifications")
+    public ResponseEntity<List<NotificationEntity>> getUserAllNotifications() {
+        List<NotificationEntity> userNotifications = userService.getLoggedInUserAllNotifications();
+        return new ResponseEntity<>(userNotifications, HttpStatus.OK);
+    }
+
+    @GetMapping("/getCurrentNotifications")
+    public ResponseEntity<List<NotificationEntity>> getUserCurrentNotifications() {
+        List<NotificationEntity> userNotifications = userService.getLoggedInUserCurrentNotifications();
+        return new ResponseEntity<>(userNotifications, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/deleteNotifications")
+    public ResponseEntity<List<NotificationEntity>> deleteNotifications() {
+        List<NotificationEntity> userNotifications = userService.deleteNotifications();
+        return new ResponseEntity<>(userNotifications, HttpStatus.OK);
     }
 
     private HttpHeaders getJwtHeader(UserPrincipal userPrincipal) {

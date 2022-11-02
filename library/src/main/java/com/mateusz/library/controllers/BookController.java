@@ -51,5 +51,9 @@ public class BookController {
     public UserEntity getBookOwnerByBookId(@PathVariable(name = "bookId")Long bookId) {
         return bookService.getBookOwnerByBookId(bookId);
 }
+@PostMapping("/return/{title}")
+public BookEntity returnBook (@PathVariable(name = "title") String title) {
+        return bookService.returnBook(title);
+}
 
 }

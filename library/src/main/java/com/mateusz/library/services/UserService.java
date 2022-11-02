@@ -1,16 +1,14 @@
 package com.mateusz.library.services;
 
 import com.mateusz.library.constants.Role;
-import com.mateusz.library.model.dao.HistoryOfBookEntity;
-import com.mateusz.library.model.dao.RoleEntity;
+import com.mateusz.library.model.dao.*;
 import com.mateusz.library.constants.UserServiceConstants;
 import com.mateusz.library.exception.domain.EmailExistsException;
 import com.mateusz.library.exception.domain.UserNotFoundException;
 import com.mateusz.library.exception.domain.UsernameExistsException;
-import com.mateusz.library.model.dao.BookEntity;
-import com.mateusz.library.model.dao.UserEntity;
 import com.mateusz.library.model.dto.*;
 import com.mateusz.library.repositories.HistoryOfBooksRepository;
+import com.mateusz.library.repositories.NotificationRepository;
 import com.mateusz.library.repositories.RolesRepository;
 import com.mateusz.library.repositories.UserRepository;
 import com.mateusz.library.security.UserPrincipal;
@@ -46,6 +44,8 @@ public class UserService implements UserDetailsService {
     private final RolesRepository rolesRepository;
 
     private final HistoryOfBooksRepository historyOfBooksRepository;
+
+    private final NotificationRepository notificationRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public List<GetUserResponse> getAllUsers() {
@@ -170,6 +170,60 @@ public class UserService implements UserDetailsService {
         return mapHistoryOfBooks(historyOfBooksRepository.findByUserEntity_username(username));
     }
 
+    public List<NotificationEntity> getLoggedInUserAllNotifications() {
+        List<NotificationEntity> listOfUserNotifications = getLoggedInUserNotifications();
+        List<NotificationEntity> duplicatedListOfUserNotifications = duplicateListOfNotifications(listOfUserNotifications);
+        setNotificationsAlreadyReadToTrue(listOfUserNotifications);
+        return duplicatedListOfUserNotifications;
+    }
+
+    private List<NotificationEntity> getLoggedInUserNotifications() {
+        UserEntity loggedInUser = getLoggedInUserEntity();
+        return loggedInUser.getNotifications();
+    }
+
+    private List<NotificationEntity> duplicateListOfNotifications(List<NotificationEntity> listOfUserNotifications) {
+        List<NotificationEntity> duplicatedList = new ArrayList<>();
+         listOfUserNotifications.forEach(notification -> {
+            NotificationEntity duplicatedNotification = NotificationEntity.builder()
+                    .bookEntity(notification.getBookEntity())
+                    .userEntity(notification.getUserEntity())
+                    .creationTime(notification.getCreationTime())
+                    .alreadyRead(notification.isAlreadyRead())
+                    .readingTimeByUser(notification.getReadingTimeByUser())
+                    .message(notification.getMessage())
+                    .id(notification.getId())
+                    .build();
+            duplicatedList.add(duplicatedNotification);
+        });
+         return duplicatedList;
+    }
+
+    public List<NotificationEntity> getLoggedInUserCurrentNotifications() {
+        List<NotificationEntity> allNotifications = getLoggedInUserAllNotifications();
+        return allNotifications.stream().filter(notification -> !notification.isAlreadyRead()).toList();
+    }
+
+    public List<NotificationEntity> deleteNotifications() {
+        UserEntity loggedInUser = getLoggedInUserEntity();
+        List<NotificationEntity> listOfUserNotifications = loggedInUser.getNotifications();
+        List<NotificationEntity> listWithNotificationsToRemove = new ArrayList<>();
+
+        for (NotificationEntity notification : listOfUserNotifications) {
+            if (notification.isAlreadyRead()) {
+                listWithNotificationsToRemove.add(notification);
+            }
+        }
+        loggedInUser.removeParticularNotifications(listWithNotificationsToRemove);
+        return listWithNotificationsToRemove;
+    }
+
+    private void setNotificationsAlreadyReadToTrue(List<NotificationEntity> listOfUserNotifications) {
+        for(NotificationEntity notification: listOfUserNotifications){
+            notification.setAlreadyRead(true);
+        }
+    }
+
     private List<HistoryOfBookForUserResponse> mapHistoryOfBooks(List<HistoryOfBookEntity> historyOfBooksByUsername) {
         return historyOfBooksByUsername.stream().map(historyOfBook -> new HistoryOfBookForUserResponse(historyOfBook.getBookEntity())).collect(Collectors.toList());
     }
@@ -218,5 +272,10 @@ public class UserService implements UserDetailsService {
     private String getCurrentlyLoggedInUsername() {
         Authentication authentication = getAuthentication();
         return authentication.getPrincipal().toString();
+    }
+
+    private UserEntity getLoggedInUserEntity() {
+        String currentlyLoggedInUsername = getCurrentlyLoggedInUsername();
+        return userRepository.findUserByUsername(currentlyLoggedInUsername);
     }
 }

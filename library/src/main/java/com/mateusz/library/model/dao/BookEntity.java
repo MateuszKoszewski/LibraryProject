@@ -53,6 +53,9 @@ public class BookEntity {
 
     private LocalDate dateOfReturn;
 
+//    @OneToMany(mappedBy = "bookEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<NotificationEntity> notifications;
+
     public void addCategory(CategoryEntity categoryEntity) {
         this.categoriesList.add(categoryEntity);
         categoryEntity.getListOfBooks().add(this);

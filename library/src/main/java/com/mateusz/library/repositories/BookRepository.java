@@ -2,11 +2,13 @@ package com.mateusz.library.repositories;
 
 import com.mateusz.library.model.dao.BookEntity;
 import com.mateusz.library.model.dao.CategoryEntity;
+import com.mateusz.library.model.dao.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BookRepository extends JpaRepository<BookEntity, Long> {
@@ -27,5 +29,6 @@ public interface BookRepository extends JpaRepository<BookEntity, Long> {
 
     List<BookEntity> findByPrice(BigDecimal price);
 
+    Optional<BookEntity> findByCurrentUserAndTitle(UserEntity user, String title);
 
 }

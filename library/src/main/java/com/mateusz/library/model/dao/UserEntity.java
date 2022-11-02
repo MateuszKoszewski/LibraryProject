@@ -19,6 +19,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class UserEntity {
 
     @Id
@@ -48,6 +49,9 @@ public class UserEntity {
 
 //    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
 //    private List<HistoryOfBookEntity> historyOfBooks;
+@JsonIgnore
+    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NotificationEntity> notifications;
 
     private BigDecimal accountBalance;
 
@@ -93,5 +97,27 @@ public class UserEntity {
 //        this.roles.remove(roleEntityToRemove);
 //
 //    }
+
+    public void addRentedBook (BookEntity bookEntity){
+        rentedBooks.add(bookEntity);
+        bookEntity.setCurrentUser(this);
+    }
+
+    public void addNotification (NotificationEntity notification) {
+        notifications.add(notification);
+        notification.setUserEntity(this);
+    }
+
+    public void removeNotification (NotificationEntity notification) {
+        notifications.remove(notification);
+        notification.setUserEntity(null);
+    }
+
+    public void removeParticularNotifications (List<NotificationEntity> listOfNotifications) {
+        notifications.removeAll(listOfNotifications);
+        for (NotificationEntity notification: listOfNotifications) {
+            notification.setUserEntity(null);
+        }
+    }
 
 }
