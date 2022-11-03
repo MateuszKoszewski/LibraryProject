@@ -183,6 +183,7 @@ private final NotificationRepository notificationRepository;
         userEntity.addNotification(notification);
         notification.setMessage(String.format(message, attribute));
         notification.setAlreadyRead(false);
+        notification.setCreationTime(DateUtils.parseDateToLocalDate(new Date()));
         notificationRepository.save(notification);
     }
 }

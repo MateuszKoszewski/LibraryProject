@@ -12,6 +12,7 @@ import com.mateusz.library.repositories.NotificationRepository;
 import com.mateusz.library.repositories.RolesRepository;
 import com.mateusz.library.repositories.UserRepository;
 import com.mateusz.library.security.UserPrincipal;
+import com.mateusz.library.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -174,7 +175,14 @@ public class UserService implements UserDetailsService {
         List<NotificationEntity> listOfUserNotifications = getLoggedInUserNotifications();
         List<NotificationEntity> duplicatedListOfUserNotifications = duplicateListOfNotifications(listOfUserNotifications);
         setNotificationsAlreadyReadToTrue(listOfUserNotifications);
+        setReadingTimeOfNotifications(listOfUserNotifications);
         return duplicatedListOfUserNotifications;
+    }
+
+    private void setReadingTimeOfNotifications(List<NotificationEntity> listOfUserNotifications) {
+        listOfUserNotifications.stream()
+                .filter(notification -> notification.getReadingTimeByUser()==null)
+                .forEach(notification -> notification.setReadingTimeByUser(DateUtils.parseDateToLocalDate(new Date())));
     }
 
     private List<NotificationEntity> getLoggedInUserNotifications() {
