@@ -31,7 +31,7 @@ public class RolesProvider implements CommandLineRunner {
     private final RolesRepository rolesRepository;
 
 
-    private String adminPassword;
+    private final String adminPassword;
 
     @Autowired
     public RolesProvider(UserRepository userRepository, RolesRepository rolesRepository, @Value("${admin.password}")String adminPassword) {

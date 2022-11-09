@@ -18,9 +18,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoryService {
 
-public final CategoryRepository categoryRepository;
+private final CategoryRepository categoryRepository;
 
-public final BookRepository bookRepository;
+private final BookRepository bookRepository;
 
     @PreAuthorize("hasAuthority('user:delete')")
     public CategoryEntity deleteCategoryById(Long categoryId) {

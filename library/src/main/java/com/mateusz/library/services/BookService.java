@@ -5,6 +5,7 @@ import com.mateusz.library.model.dao.*;
 import com.mateusz.library.model.dto.GetBookResponse;
 import com.mateusz.library.repositories.*;
 import com.mateusz.library.utils.DateUtils;
+import com.mateusz.library.utils.LibraryStringUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -87,7 +89,7 @@ private final NotificationRepository notificationRepository;
             addCommonRecords(listOfResults, listByTitles, authorsListIsNull);
             titlesListIsNull=false;
         }
-        if(StringUtils.isNotBlank(com.mateusz.library.utils.StringUtils.nullSafeToString(bookEntity.getPrice()))) {
+        if(StringUtils.isNotBlank(LibraryStringUtils.nullSafeToString(bookEntity.getPrice()))) {
             List<BookEntity> listByPrices = bookRepository.findByPrice(bookEntity.getPrice());
             addCommonRecords(listOfResults, listByPrices, titlesListIsNull && authorsListIsNull);
             priceListIsNull=false;
@@ -183,7 +185,8 @@ private final NotificationRepository notificationRepository;
         userEntity.addNotification(notification);
         notification.setMessage(String.format(message, attribute));
         notification.setAlreadyRead(false);
-        notification.setCreationTime(DateUtils.parseDateToLocalDate(new Date()));
+//        notification.setCreationTime(new Timestamp((new Date()).getTime()));
+        notification.setCreationTime(DateUtils.parseDateToLocalDateTime(new Date()));
         notificationRepository.save(notification);
     }
 }

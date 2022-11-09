@@ -36,19 +36,6 @@ public class UserController extends ExceptionHandling {
     private final AuthenticationManager authenticationManager;
     private JWTTokenProvider jwtTokenProvider;
 
-    @GetMapping("/getAllUsers")
-    public List<GetUserResponse> getAllUsers() {
-        return userService.getAllUsers();
-    }
-
-    @PostMapping("/user")
-    public AddUserResponse addUser(@RequestBody AddUserRequest addUserRequest){
-        return userService.addUser(addUserRequest);
-    }
-    @GetMapping("/api/user/{email}")
-    public GetUserResponse getParticularUser(@PathVariable(name="email") String email){
-        return userService.getParticularUser(email);
-    }
     @GetMapping("/api/home")
     public GetUserResponse goToHomePage() {
         throw new BadCredentialsException("it's working");
@@ -59,9 +46,19 @@ public class UserController extends ExceptionHandling {
         UserEntity newUser = userService.register(userEntity.getFirstName(), userEntity.getLastName(), userEntity.getUsername(), userEntity.getEmail(), userEntity.getPassword());
         return new ResponseEntity<>(newUser, HttpStatus.OK);
     }
+    @PostMapping("/changeUserData/{userId}")
+    public ResponseEntity<UserEntity> changeUserData(@RequestBody @Valid UserEntity userEntity, @PathVariable(name = "userId") Long userId ) throws UserNotFoundException, UsernameExistsException, EmailExistsException {
+        UserEntity editedUser = userService.changeUserData(userId, userEntity.getFirstName(), userEntity.getLastName(), userEntity.getUsername(), userEntity.getEmail(), userEntity.getPassword());
+        return new ResponseEntity<>(editedUser, HttpStatus.OK);
+    }
+    @PostMapping("changeMyData")
+    public ResponseEntity<UserEntity> changeMyData(@RequestBody @Valid UserEntity userEntity) throws UserNotFoundException, UsernameExistsException, EmailExistsException {
+        UserEntity editedUser = userService.changeUserData(null, userEntity.getFirstName(), userEntity.getLastName(), userEntity.getUsername(), userEntity.getEmail(), userEntity.getPassword());
+        return new ResponseEntity<>(editedUser, HttpStatus.OK);
+    }
 
     @PostMapping("/login")
-    public ResponseEntity<UserEntity> login(@RequestBody UserEntity userEntity) {
+    public ResponseEntity<UserEntity> login(@RequestBody UserEntity userEntity) throws UserNotFoundException {
         authenticate(userEntity.getUsername(), userEntity.getPassword());
         UserEntity loginUser = userService.findUserByUsername(userEntity.getUsername());
         UserPrincipal userPrincipal = new UserPrincipal(loginUser);
@@ -70,7 +67,7 @@ public class UserController extends ExceptionHandling {
     }
 
     @DeleteMapping("/deleteByUsername/{username}")
-    public ResponseEntity<UserEntity> deleteUserByUsername(@PathVariable(name = "username") String username){
+    public ResponseEntity<UserEntity> deleteUserByUsername(@PathVariable(name = "username") String username) throws UserNotFoundException {
         UserEntity deletedUser = userService.deleteUser(username);
         return new ResponseEntity<>(deletedUser, HttpStatus.OK);
     }
@@ -92,33 +89,15 @@ public class UserController extends ExceptionHandling {
         return new ResponseEntity<>(myHistory, HttpStatus.OK);
     }
     @GetMapping("/getUserHistoryById/{userId}")
-    public ResponseEntity<List<HistoryOfBookForUserResponse>> getUserHistoryById(@PathVariable(name = "userId")Long userId) {
+    public ResponseEntity<List<HistoryOfBookForUserResponse>> getUserHistoryById(@PathVariable(name = "userId")Long userId) throws UserNotFoundException {
         List<HistoryOfBookForUserResponse> userHistory = userService.getUserHistoryById(userId);
         return new ResponseEntity<>(userHistory, HttpStatus.OK);
     }
 
     @GetMapping("/getUserHistoryByUsername/{username}")
-    public ResponseEntity<List<HistoryOfBookForUserResponse>> getUserHistoryByUsername(@PathVariable(name = "username")String username) {
+    public ResponseEntity<List<HistoryOfBookForUserResponse>> getUserHistoryByUsername(@PathVariable(name = "username")String username) throws UserNotFoundException {
         List<HistoryOfBookForUserResponse> userHistory = userService.getUserHistoryByUsername(username);
         return new ResponseEntity<>(userHistory, HttpStatus.OK);
-    }
-
-    @GetMapping("/getAllNotifications")
-    public ResponseEntity<List<NotificationEntity>> getUserAllNotifications() {
-        List<NotificationEntity> userNotifications = userService.getLoggedInUserAllNotifications();
-        return new ResponseEntity<>(userNotifications, HttpStatus.OK);
-    }
-
-    @GetMapping("/getCurrentNotifications")
-    public ResponseEntity<List<NotificationEntity>> getUserCurrentNotifications() {
-        List<NotificationEntity> userNotifications = userService.getLoggedInUserCurrentNotifications();
-        return new ResponseEntity<>(userNotifications, HttpStatus.OK);
-    }
-
-    @DeleteMapping("/deleteNotifications")
-    public ResponseEntity<List<NotificationEntity>> deleteNotifications() {
-        List<NotificationEntity> userNotifications = userService.deleteNotifications();
-        return new ResponseEntity<>(userNotifications, HttpStatus.OK);
     }
 
     private HttpHeaders getJwtHeader(UserPrincipal userPrincipal) {
