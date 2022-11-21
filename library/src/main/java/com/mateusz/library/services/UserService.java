@@ -11,18 +11,14 @@ import com.mateusz.library.exception.domain.UserNotFoundException;
 import com.mateusz.library.exception.domain.UsernameExistsException;
 import com.mateusz.library.model.dto.*;
 import com.mateusz.library.repositories.HistoryOfBooksRepository;
-import com.mateusz.library.repositories.NotificationRepository;
 import com.mateusz.library.repositories.RolesRepository;
 import com.mateusz.library.repositories.UserRepository;
 import com.mateusz.library.security.UserPrincipal;
-import com.mateusz.library.utils.DateUtils;
 import com.mateusz.library.utils.LibraryStringUtils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -35,7 +31,6 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -44,7 +39,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Getter
 public class UserService implements UserDetailsService {
 
     private Logger LOGGER = LoggerFactory.getLogger(getClass());
@@ -72,7 +66,7 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public UserEntity register(String firstName, String lastName, String username, String email, String password) throws UserNotFoundException, UsernameExistsException, EmailExistsException {
+    public UserEntity register(String firstName, String lastName, String username, String email, String password) throws UsernameExistsException, EmailExistsException {
         validateNewUsernameAndEmail(null, username, email);
         UserEntity userEntity = new UserEntity();
         String encodedPassword = encodePassword(password);
@@ -105,7 +99,7 @@ public class UserService implements UserDetailsService {
     }
 
     private String encodePassword(String password) {
-        return getBCryptPasswordEncoder().encode(password);
+        return bCryptPasswordEncoder.encode(password);
     }
 
     public UserEntity findUserByUsername (String username){
@@ -164,14 +158,11 @@ public class UserService implements UserDetailsService {
         return historyOfBooksByUsername.stream().map(historyOfBook -> new HistoryOfBookForUserResponse(historyOfBook.getBookEntity())).collect(Collectors.toList());
     }
 
-    private UserEntity validateNewUsernameAndEmail(UserEntity userEntity, String newUsername, String newEmail) throws UserNotFoundException, UsernameExistsException, EmailExistsException {
+    private UserEntity validateNewUsernameAndEmail(UserEntity userEntity, String newUsername, String newEmail) throws UsernameExistsException, EmailExistsException {
         UserEntity userByUsername = findUserByUsername(newUsername);
         UserEntity userByEmail = findUserByEmail(newEmail);
         if (userEntity!=null) {
             UserEntity currentUser = userEntity;
-//            if (currentUser == null) {
-//                throw new UserNotFoundException("No user found by username " + currentUsername);
-//            }
             if (userByUsername != null && !currentUser.getId().equals(userByUsername.getId())) {
                 throw new UsernameExistsException(UserServiceConstants.USERNAME_ALREADY_EXISTS);
             }
@@ -240,12 +231,11 @@ public class UserService implements UserDetailsService {
             userEntity.setEmail(email);
         }
         if (LibraryStringUtils.isNotBlankAndNull(password)) {
-            userEntity.setPassword(getBCryptPasswordEncoder().encode(password));
-//            userEntity.setPassword(bCryptPasswordEncoder.encode(password));
+            userEntity.setPassword(bCryptPasswordEncoder.encode(password));
         }
     }
 
-    private void validateAndSetUserData(UserEntity userEntity, String firstName, String lastName, String username, String email, String password) throws UserNotFoundException, UsernameExistsException, EmailExistsException {
+    private void validateAndSetUserData(UserEntity userEntity, String firstName, String lastName, String username, String email, String password) throws UsernameExistsException, EmailExistsException {
         validateNewUsernameAndEmail(userEntity, username, email);
         setUserData(userEntity, firstName, lastName, username, email, password);
     }

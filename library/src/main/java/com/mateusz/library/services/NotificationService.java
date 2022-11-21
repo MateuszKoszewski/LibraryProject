@@ -88,13 +88,4 @@ public class NotificationService {
                 .forEach(notification -> notification.setReadingTimeByUser(DateUtils.parseDateToLocalDateTime(new Date())));
     }
 
-    private NotificationEntity createNotificationsForUser(UserEntity userEntity) {
-        NotificationEntity notification = new NotificationEntity();
-//        notification.setBookEntity(!userEntity.getRentedBooks().isEmpty() ? userEntity.getRentedBooks().get(0) : createBookForUser(userEntity));
-        notification.setUserEntity(userEntity);
-        notification.setAlreadyRead(false);
-        notification.setReadingTimeByUser(DateUtils.parseDateToLocalDateTime(new Date()));
-        notification.setMessage(NotificationMessages.USER_HAS_RENTED_BOOK);
-        return notification;
-    }
 }

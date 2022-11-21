@@ -2,6 +2,7 @@ package com.mateusz.library.services;
 
 
 
+import com.mateusz.library.TestUtils;
 import com.mateusz.library.constants.NotificationMessages;
 import com.mateusz.library.constants.Role;
 import com.mateusz.library.constants.SuperAdminRoleConstants;
@@ -26,6 +27,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.NoResultException;
@@ -60,7 +62,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userEntity = getSimpleUser();
+        UserEntity userEntity = TestUtils.getSimpleUser();
         //
         //When
         //
@@ -76,7 +78,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userEntity = getSimpleUser();
+        UserEntity userEntity = TestUtils.getSimpleUser();
         userEntity.setUsername(null);
         //
         //When
@@ -93,7 +95,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userEntity = getSimpleUser();
+        UserEntity userEntity = TestUtils.getSimpleUser();
         //
         //When
         //
@@ -120,7 +122,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userTryingChangeData = getSimpleUser();
+        UserEntity userTryingChangeData = TestUtils.getSimpleUser();
         UserEntity userWithAlreadyChangedData = getAnotherUserWithSameId();
         //
         //When
@@ -146,7 +148,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userTryingChangeData = getSimpleUser();
+        UserEntity userTryingChangeData = TestUtils.getSimpleUser();
         UserEntity userWithAlreadyChangedData = getAnotherUserWithSameId();
         //
         //When
@@ -171,7 +173,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userTryingChangeData = getSimpleUser();
+        UserEntity userTryingChangeData = TestUtils.getSimpleUser();
         UserEntity userWithAlreadyChangedData = getAnotherUserWithSameId();
         //
         //When
@@ -188,7 +190,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userTryingChangeData = getSimpleUser();
+        UserEntity userTryingChangeData = TestUtils.getSimpleUser();
         UserEntity userWithAlreadyChangedData = getAnotherUserWithSameId();
         UserEntity anotherUser = getAnotherUser();
         //
@@ -208,7 +210,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userTryingChangeData = getSimpleUser();
+        UserEntity userTryingChangeData = TestUtils.getSimpleUser();
         UserEntity userWithAlreadyChangedData = getAnotherUserWithSameId();
         //
         //When
@@ -226,7 +228,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userTryingChangeData = getSimpleUser();
+        UserEntity userTryingChangeData = TestUtils.getSimpleUser();
         UserEntity userWithAlreadyChangedData = getAnotherUserWithSameId();
         //
         //When
@@ -245,7 +247,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userTryingChangeData = getSimpleUser();
+        UserEntity userTryingChangeData = TestUtils.getSimpleUser();
         UserEntity userWithAlreadyChangedData = getAnotherUserWithSameId();
         //
         //When
@@ -265,7 +267,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userToDelete = getSimpleUser();
+        UserEntity userToDelete = TestUtils.getSimpleUser();
         UserEntity wrongUserAuthenticated = getAnotherUser();
         //
         //When
@@ -283,7 +285,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userToDelete = getSimpleUser();
+        UserEntity userToDelete = TestUtils.getSimpleUser();
         //
         //When
         //
@@ -300,7 +302,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userToDelete = getSimpleUser();
+        UserEntity userToDelete = TestUtils.getSimpleUser();
         //
         //When
         //
@@ -316,7 +318,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userToDelete = getSimpleUser();
+        UserEntity userToDelete = TestUtils.getSimpleUser();
         //
         //When
         //
@@ -334,7 +336,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userToDelete = getSimpleUser();
+        UserEntity userToDelete = TestUtils.getSimpleUser();
         //
         //When
         //
@@ -351,7 +353,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userEntity = getSimpleUser();
+        UserEntity userEntity = TestUtils.getSimpleUser();
         //
         //When
         //
@@ -373,7 +375,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userEntity = getSimpleUser();
+        UserEntity userEntity = TestUtils.getSimpleUser();
         List<HistoryOfBookEntity> listOfHistory = getListOfHistoryOfBookEntity(userEntity);
         List<HistoryOfBookForUserResponse> listOfHistoryForUser = mapHistoryOfBooks(listOfHistory);
         //
@@ -397,7 +399,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userEntity = getSimpleUser();
+        UserEntity userEntity = TestUtils.getSimpleUser();
         List<HistoryOfBookEntity> listOfHistory = getListOfHistoryOfBookEntity(userEntity);
         List<HistoryOfBookForUserResponse> listOfHistoryForUser = mapHistoryOfBooks(listOfHistory);
         //
@@ -417,7 +419,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userEntity = getSimpleUser();
+        UserEntity userEntity = TestUtils.getSimpleUser();
         //
         //When
         //
@@ -433,7 +435,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userEntity = getSimpleUser();
+        UserEntity userEntity = TestUtils.getSimpleUser();
         //
         //When
         //
@@ -449,7 +451,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userLoggedIn = getSimpleUser();
+        UserEntity userLoggedIn = TestUtils.getSimpleUser();
         UserEntity userWhomHistoryIsBeingLookedFor = getAnotherUser();
         //
         //When
@@ -467,7 +469,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userEntity = getSimpleUser();
+        UserEntity userEntity = TestUtils.getSimpleUser();
         //
         //When
         //
@@ -483,7 +485,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userEntity = getSimpleUser();
+        UserEntity userEntity = TestUtils.getSimpleUser();
         //
         //When
         //
@@ -499,7 +501,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userLoggedIn = getSimpleUser();
+        UserEntity userLoggedIn = TestUtils.getSimpleUser();
         UserEntity userWhomHistoryIsBeingLookedFor = getAnotherUser();
         //
         //When
@@ -517,7 +519,7 @@ public class UserServiceTest {
         //
         //Given
         //
-        UserEntity userEntity = getSimpleUser();
+        UserEntity userEntity = TestUtils.getSimpleUser();
         List<HistoryOfBookEntity> listOfHistory = getListOfHistoryOfBookEntity(userEntity);
         List<HistoryOfBookForUserResponse> listOfHistoryForUser = mapHistoryOfBooks(listOfHistory);
         //
@@ -531,20 +533,50 @@ public class UserServiceTest {
         //
         assertEquals(listOfHistoryForUser, userService.getUserHistoryByUsername(userEntity.getUsername()));
     }
-
-    private UserEntity getSimpleUser() {
-        UserEntity userEntity = new UserEntity();
-        userEntity.setId(2L);
-        userEntity.setFirstName("John");
-        userEntity.setLastName("Smith");
-        userEntity.setUsername("john1");
-        userEntity.setEmail("john@john.com");
-        userEntity.setPassword("John123");
-        userEntity.setAuthorities(Role.ROLE_USER.getAuthorities());
-        createBookForUser(userEntity);
-//        createNotificationsForUser(userEntity);
-        return userEntity;
+    @Test
+    void shouldNotLoadUserByUsername_userNotFound() {
+        //
+        //Given
+        //
+        UserEntity userEntity = TestUtils.getSimpleUser();
+        //
+        //When
+        //
+        Mockito.when(userRepository.findUserByUsername(userEntity.getUsername())).thenReturn(null);
+        //
+        //Then
+        //
+        assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername(userEntity.getUsername()));
     }
+    @Test
+    void shouldLoadUserByUsername() {
+        //
+        //Given
+        //
+        UserEntity userEntity = TestUtils.getSimpleUser();
+        UserPrincipal userPrincipal = new UserPrincipal(userEntity);
+        //
+        //When
+        //
+        Mockito.when(userRepository.findUserByUsername(userEntity.getUsername())).thenReturn(userEntity);
+        //
+        //Then
+        //
+        assertEquals(userPrincipal, userService.loadUserByUsername(userEntity.getUsername()));
+    }
+
+//    private UserEntity getSimpleUser() {
+//        UserEntity userEntity = new UserEntity();
+//        userEntity.setId(2L);
+//        userEntity.setFirstName("John");
+//        userEntity.setLastName("Smith");
+//        userEntity.setUsername("john1");
+//        userEntity.setEmail("john@john.com");
+//        userEntity.setPassword("John123");
+//        userEntity.setAuthorities(Role.ROLE_USER.getAuthorities());
+//        createBookForUser(userEntity);
+//        return userEntity;
+//    }
 
     private UserEntity getAnotherUserWithSameId() {
         UserEntity userEntity = new UserEntity();

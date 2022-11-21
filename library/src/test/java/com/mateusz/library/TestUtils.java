@@ -8,6 +8,7 @@ import com.mateusz.library.model.dao.NotificationEntity;
 import com.mateusz.library.model.dao.UserEntity;
 import com.mateusz.library.security.UserPrincipal;
 import com.mateusz.library.utils.DateUtils;
+import com.mateusz.library.utils.PasswordEncoder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -24,10 +25,20 @@ public class TestUtils {
         userEntity.setLastName("Smith");
         userEntity.setUsername("john1");
         userEntity.setEmail("john@john.com");
-        userEntity.setPassword("John123");
+        userEntity.setPassword(PasswordEncoder.encodePassword("John123"));
+        userEntity.setNotLocked(true);
+        userEntity.setActive(true);
+        userEntity.setLastLoginDateDisplay(userEntity.getLastLoginDate());
+        userEntity.setLastLoginDate(new Date());
         userEntity.setAuthorities(Role.ROLE_USER.getAuthorities());
 //        createBookForUser(userEntity);
 //        createNotificationsForUser(userEntity);
+        return userEntity;
+    }
+
+    public static UserEntity getSimpleUserWithPasswordDecoded() {
+        UserEntity userEntity = getSimpleUser();
+        userEntity.setPassword("John123");
         return userEntity;
     }
 
@@ -56,5 +67,15 @@ public class TestUtils {
         UserPrincipal userPrincipal = new UserPrincipal(userEntity);
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userPrincipal.getUsername(), null, userPrincipal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+    }
+
+    public static UserEntity getAnotherUserWithSameId() {
+        UserEntity userEntity = getSimpleUser();
+        userEntity.setFirstName("John2");
+        userEntity.setLastName("Smith2");
+        userEntity.setUsername("john12");
+        userEntity.setEmail("john@john.com2");
+        userEntity.setPassword(PasswordEncoder.encodePassword("John1232"));
+        return userEntity;
     }
 }
