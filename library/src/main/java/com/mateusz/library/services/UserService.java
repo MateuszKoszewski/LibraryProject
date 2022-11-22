@@ -109,7 +109,7 @@ public class UserService implements UserDetailsService {
     public UserEntity findUserByEmail (String email) {
         return userRepository.findUserByEmail(email);
     }
-@PreAuthorize("authentication.principal.equals(#username)")
+
     public UserEntity deleteUser(String username){
         UserEntity userToDelete = userRepository.findUserByUsername(username);
         userRepository.delete(userToDelete);

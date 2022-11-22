@@ -2,10 +2,8 @@ package com.mateusz.library;
 
 import com.mateusz.library.constants.NotificationMessages;
 import com.mateusz.library.constants.Role;
-import com.mateusz.library.model.dao.BookEntity;
-import com.mateusz.library.model.dao.CategoryEntity;
-import com.mateusz.library.model.dao.NotificationEntity;
-import com.mateusz.library.model.dao.UserEntity;
+import com.mateusz.library.model.dao.*;
+import com.mateusz.library.model.dto.HistoryOfBookForUserResponse;
 import com.mateusz.library.security.UserPrincipal;
 import com.mateusz.library.utils.DateUtils;
 import com.mateusz.library.utils.PasswordEncoder;
@@ -15,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TestUtils {
 
@@ -77,5 +76,59 @@ public class TestUtils {
         userEntity.setEmail("john@john.com2");
         userEntity.setPassword(PasswordEncoder.encodePassword("John1232"));
         return userEntity;
+    }
+
+    public static UserEntity getAnotherUser() {
+        UserEntity userEntity = getSimpleUser();
+        userEntity.setId(3L);
+        userEntity.setFirstName("John3");
+        userEntity.setLastName("Smith3");
+        userEntity.setUsername("john13");
+        userEntity.setEmail("john@john.com3");
+        userEntity.setPassword("John1233");
+        userEntity.setAuthorities(Role.ROLE_USER.getAuthorities());
+        return userEntity;
+    }
+
+    public static HistoryOfBookEntity getHistoryOfBookEntity(UserEntity userEntity) {
+        HistoryOfBookEntity historyOfBookEntity = new HistoryOfBookEntity();
+        historyOfBookEntity.setId(1L);
+        historyOfBookEntity.setUserEntity(userEntity);
+        historyOfBookEntity.setBookEntity(createSimpleBook());
+        return historyOfBookEntity;
+    }
+
+    public static BookEntity createSimpleBook() {
+        BookEntity bookEntity = new BookEntity();
+        bookEntity.setId(2L);
+        bookEntity.setTitle("The returning of the king".toLowerCase());
+        bookEntity.setAuthor("Tolkien".toLowerCase());
+        bookEntity.setPresent(true);
+        setCategoriesForBook(bookEntity, "przygodowa", "science-fiction");
+        return bookEntity;
+    }
+
+    public static BookEntity createAnotherBook() {
+        BookEntity bookEntity = new BookEntity();
+        bookEntity.setId(3L);
+        bookEntity.setTitle("The two towers");
+        bookEntity.setAuthor("Tolkien");
+        bookEntity.setPresent(true);
+        return bookEntity;
+    }
+
+    public static List<HistoryOfBookForUserResponse> mapHistoryOfBooks(List<HistoryOfBookEntity> historyOfBooksByUsername) {
+        return historyOfBooksByUsername.stream().map(historyOfBook -> new HistoryOfBookForUserResponse(historyOfBook.getBookEntity())).collect(Collectors.toList());
+    }
+
+    private static void setCategoriesForBook(BookEntity bookEntity, String... categories) {
+        List<CategoryEntity> listOfCategories = new ArrayList<>();
+        for (String category: categories) {
+            CategoryEntity categoryEntity = new CategoryEntity();
+            categoryEntity.setName(category);
+            categoryEntity.setListOfBooks(List.of(bookEntity));
+            listOfCategories.add(categoryEntity);
+        }
+        bookEntity.setCategoriesList(listOfCategories);
     }
 }

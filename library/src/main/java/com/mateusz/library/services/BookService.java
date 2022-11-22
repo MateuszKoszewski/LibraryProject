@@ -38,19 +38,11 @@ private final HistoryOfBooksRepository historyOfBooksRepository;
 private final NotificationRepository notificationRepository;
 
 
-    public List<GetBookResponse> getAllBooks() {
-        return bookRepository.findAll().stream().map(book -> GetBookResponse.builder()
-                .id(book.getId())
-                .title(book.getTitle())
-                .author(book.getAuthor())
-                .build())
-                .collect(Collectors.toList());
-    }
-    @PreAuthorize("hasAuthority('user:delete')")
+
     public List<BookEntity> getAllRentedBooks() {
         return bookRepository.findByPresentIsFalse();
     }
-@PreAuthorize("hasAuthority('user:delete')")
+
     public BookEntity addBook(String title, String author, List<CategoryEntity> listOfCategories, BigDecimal price){
         BookEntity bookEntity = new BookEntity();
         bookEntity.setAuthor(author.toLowerCase());

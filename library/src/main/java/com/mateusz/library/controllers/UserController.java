@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,11 +36,6 @@ public class UserController extends ExceptionHandling {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private JWTTokenProvider jwtTokenProvider;
-
-    @GetMapping("/api/home")
-    public GetUserResponse goToHomePage() {
-        throw new BadCredentialsException("it's working");
-    }
 
     @PostMapping("/register")
     public ResponseEntity<UserEntity> register(@RequestBody @Valid UserEntity userEntity) throws UserNotFoundException, UsernameExistsException, EmailExistsException {
@@ -65,7 +61,7 @@ public class UserController extends ExceptionHandling {
         HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
         return new ResponseEntity<>(loginUser, jwtHeader, HttpStatus.OK);
     }
-
+    @PreAuthorize("authentication.principal.equals(#username)")
     @DeleteMapping("/deleteByUsername/{username}")
     public ResponseEntity<UserEntity> deleteUserByUsername(@PathVariable(name = "username") String username) throws UserNotFoundException {
         UserEntity deletedUser = userService.deleteUser(username);

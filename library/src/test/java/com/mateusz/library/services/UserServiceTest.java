@@ -695,5 +695,4 @@ public class UserServiceTest {
         SecurityContextHolder.clearContext();
     }
 
-
 }

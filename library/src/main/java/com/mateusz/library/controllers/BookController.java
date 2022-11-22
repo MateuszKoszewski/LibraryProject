@@ -7,6 +7,7 @@ import com.mateusz.library.model.dto.AddBookResponse;
 import com.mateusz.library.model.dto.GetBookResponse;
 import com.mateusz.library.services.BookService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,15 +19,12 @@ public class BookController {
 
     private final BookService bookService;
 
-    @GetMapping("/getAllBooks")
-    public List<GetBookResponse> getAllBooks() {
-        return bookService.getAllBooks();
-    }
-
+    @PreAuthorize("hasAuthority('user:delete')")
     @GetMapping("/getAllRentedBooks")
     public List<BookEntity> getAllRentedBooks() {
         return bookService.getAllRentedBooks();
     }
+    @PreAuthorize("hasAuthority('user:delete')")
     @PostMapping("/addBook")
     public BookEntity addBook(@RequestBody BookEntity bookEntity) {
         return bookService.addBook(bookEntity.getTitle(), bookEntity.getAuthor(), bookEntity.getCategoriesList(), bookEntity.getPrice());
