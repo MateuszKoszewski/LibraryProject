@@ -10,6 +10,7 @@ import com.mateusz.library.utils.PasswordEncoder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +33,8 @@ public class TestUtils {
         userEntity.setAuthorities(Role.ROLE_USER.getAuthorities());
 //        createBookForUser(userEntity);
 //        createNotificationsForUser(userEntity);
+        userEntity.setNotifications(new ArrayList<>());
+        userEntity.setRentedBooks(new ArrayList<>());
         return userEntity;
     }
 
@@ -104,6 +107,7 @@ public class TestUtils {
         bookEntity.setTitle("The returning of the king".toLowerCase());
         bookEntity.setAuthor("Tolkien".toLowerCase());
         bookEntity.setPresent(true);
+        bookEntity.setPrice(BigDecimal.valueOf(10L));
         setCategoriesForBook(bookEntity, "przygodowa", "science-fiction");
         return bookEntity;
     }

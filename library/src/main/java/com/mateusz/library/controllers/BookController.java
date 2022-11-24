@@ -45,6 +45,7 @@ public class BookController {
     public BookEntity rentBook(@PathVariable(name = "bookTitle") String bookTitle){
         return bookService.rentBook(bookTitle);
     }
+    @PreAuthorize("hasAuthority('user:delete')")
 @GetMapping("/{bookId}")
     public UserEntity getBookOwnerByBookId(@PathVariable(name = "bookId")Long bookId) {
         return bookService.getBookOwnerByBookId(bookId);

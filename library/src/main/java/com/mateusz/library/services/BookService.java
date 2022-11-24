@@ -130,12 +130,9 @@ private final NotificationRepository notificationRepository;
                 .orElseThrow(() -> new NoResultException("book is not available"));
         bookToRent.setPresent(false);
         loggedUser.addRentedBook(bookToRent);
-//        bookToRent.setCurrentUser(loggedUser);
         bookToRent.setDateOfRent(DateUtils.parseDateToLocalDate(new Date()));
-//        loggedUser.getRentedBooks().add(bookToRent);
         createNotification(loggedUser, bookToRent, NotificationMessages.USER_HAS_RENTED_BOOK, bookToRent.getTitle());
-//        createHistoryOfBookEntity(loggedUser, bookToRent);
-        return null;
+        return bookToRent;
     }
 
     public BookEntity returnBook(String title) {
@@ -150,7 +147,7 @@ private final NotificationRepository notificationRepository;
         createNotification(loggedUser, bookToReturn, NotificationMessages.USER_HAS_RETURNED_BOOK, bookToReturn.getTitle());
         return bookToReturn;
     }
-    @PreAuthorize("hasAuthority('user:delete')")
+
     public UserEntity getBookOwnerByBookId(Long bookId) {
        BookEntity book = bookRepository.findById(bookId).orElseThrow(() -> new NoResultException("book doesn't exist"));
        return book.getCurrentUser();
