@@ -17,6 +17,7 @@ import javax.persistence.NoResultException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -67,11 +68,13 @@ public class BookServiceTest {
         //
         BookEntity bookEntity = TestUtils.createSimpleBook();
         bookEntity.setId(null);
+        String[] bookCategories = bookEntity.getCategoriesList().stream().map(CategoryEntity::getName).toArray(String[]::new);
         //
         //When
         //
         Mockito.when(categoryRepository.findCategoryByName(bookEntity.getCategoriesList().get(0).getName())).thenReturn(Optional.of(bookEntity.getCategoriesList().get(0)));
-        BookEntity savedBook = bookService.addBook(bookEntity.getTitle(), bookEntity.getAuthor(), bookEntity.getCategoriesList(), bookEntity.getPrice());
+        Mockito.when(categoryRepository.findCategoryByName(bookEntity.getCategoriesList().get(1).getName())).thenReturn(Optional.of(bookEntity.getCategoriesList().get(1)));
+        BookEntity savedBook = bookService.addBook(bookEntity.getTitle(), bookEntity.getAuthor(), bookCategories, bookEntity.getPrice());
         //
         //Then
         //

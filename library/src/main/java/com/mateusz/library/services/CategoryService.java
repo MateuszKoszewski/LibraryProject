@@ -22,7 +22,7 @@ private final CategoryRepository categoryRepository;
 
 private final BookRepository bookRepository;
 
-    @PreAuthorize("hasAuthority('user:delete')")
+
     public CategoryEntity deleteCategoryById(Long categoryId) {
         CategoryEntity categoryToRemove = categoryRepository.findById(categoryId).orElseThrow(() -> new NoResultException("category not found"));
         return deleteCategory(categoryToRemove);
@@ -33,7 +33,7 @@ private final BookRepository bookRepository;
 //        categoryRepository.delete(categoryToRemove);
 //        return null;
     }
-    @PreAuthorize("hasAuthority('user:delete')")
+
     public CategoryEntity deleteCategoryByName(String categoryName) {
         CategoryEntity categoryToRemove = categoryRepository.findCategoryByName(categoryName).orElseThrow(() -> new NoResultException("category not found"));
         return deleteCategory(categoryToRemove);
@@ -46,6 +46,6 @@ private final BookRepository bookRepository;
             bookEntity.removeCategory(categoryToRemove);
         }
         categoryRepository.delete(categoryToRemove);
-        return null;
+        return categoryToRemove;
     }
 }

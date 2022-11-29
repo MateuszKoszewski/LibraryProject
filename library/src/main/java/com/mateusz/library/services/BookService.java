@@ -2,13 +2,11 @@ package com.mateusz.library.services;
 
 import com.mateusz.library.constants.NotificationMessages;
 import com.mateusz.library.model.dao.*;
-import com.mateusz.library.model.dto.GetBookResponse;
 import com.mateusz.library.repositories.*;
 import com.mateusz.library.utils.DateUtils;
 import com.mateusz.library.utils.LibraryStringUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Service;
 import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -43,7 +40,7 @@ private final NotificationRepository notificationRepository;
         return bookRepository.findByPresentIsFalse();
     }
 
-    public BookEntity addBook(String title, String author, List<CategoryEntity> listOfCategories, BigDecimal price){
+    public BookEntity addBook(String title, String author, String[] listOfCategories, BigDecimal price){
         BookEntity bookEntity = new BookEntity();
         bookEntity.setAuthor(author.toLowerCase());
         bookEntity.setTitle(title.toLowerCase());
@@ -109,15 +106,16 @@ private final NotificationRepository notificationRepository;
         listOfResults.retainAll(currentList);
     }
 
-    private List<CategoryEntity> setExistingCategories(List<CategoryEntity> listOfCategories) {
+    private List<CategoryEntity> setExistingCategories(String[] listOfCategories) {
         List<CategoryEntity> listToSet = new ArrayList<>();
-        for (CategoryEntity category : listOfCategories){
-            Optional<CategoryEntity> categoryFromDB = categoryRepository.findCategoryByName(category.getName().toLowerCase());
+        for (String category : listOfCategories){
+            Optional<CategoryEntity> categoryFromDB = categoryRepository.findCategoryByName(category.toLowerCase());
             if (categoryFromDB.isPresent()){
                 listToSet.add(categoryFromDB.get());
             } else {
-                category.setName(category.getName().toLowerCase());
-                listToSet.add(category);
+                CategoryEntity categoryEntity = new CategoryEntity();
+                categoryEntity.setName(category.toLowerCase());
+                listToSet.add(categoryEntity);
             }
         }
         return listToSet;

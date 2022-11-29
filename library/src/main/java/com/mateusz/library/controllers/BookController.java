@@ -3,8 +3,6 @@ package com.mateusz.library.controllers;
 import com.mateusz.library.model.dao.BookEntity;
 import com.mateusz.library.model.dao.UserEntity;
 import com.mateusz.library.model.dto.AddBookRequest;
-import com.mateusz.library.model.dto.AddBookResponse;
-import com.mateusz.library.model.dto.GetBookResponse;
 import com.mateusz.library.services.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,8 +24,9 @@ public class BookController {
     }
     @PreAuthorize("hasAuthority('user:delete')")
     @PostMapping("/addBook")
-    public BookEntity addBook(@RequestBody BookEntity bookEntity) {
-        return bookService.addBook(bookEntity.getTitle(), bookEntity.getAuthor(), bookEntity.getCategoriesList(), bookEntity.getPrice());
+    public BookEntity addBook(@RequestBody AddBookRequest addBookRequest) {
+        BookEntity addedBook = bookService.addBook(addBookRequest.getTitle(), addBookRequest.getAuthor(), addBookRequest.getCategoriesList(), addBookRequest.getPrice());
+        return addedBook;
     }
     @GetMapping("/getById/{bookId}")
     public BookEntity getBookById(@PathVariable(name = "bookId")Long bookId) {

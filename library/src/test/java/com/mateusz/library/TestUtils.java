@@ -1,20 +1,33 @@
 package com.mateusz.library;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mateusz.library.constants.NotificationMessages;
 import com.mateusz.library.constants.Role;
+import com.mateusz.library.constants.SecurityConstants;
+import com.mateusz.library.constants.SuperAdminRoleConstants;
 import com.mateusz.library.model.dao.*;
 import com.mateusz.library.model.dto.HistoryOfBookForUserResponse;
+import com.mateusz.library.security.JWTTokenProvider;
 import com.mateusz.library.security.UserPrincipal;
 import com.mateusz.library.utils.DateUtils;
 import com.mateusz.library.utils.PasswordEncoder;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 public class TestUtils {
 
@@ -127,12 +140,47 @@ public class TestUtils {
 
     private static void setCategoriesForBook(BookEntity bookEntity, String... categories) {
         List<CategoryEntity> listOfCategories = new ArrayList<>();
+        List<BookEntity> listOfBooks = new ArrayList<>();
+        listOfBooks.add(bookEntity);
         for (String category: categories) {
             CategoryEntity categoryEntity = new CategoryEntity();
             categoryEntity.setName(category);
-            categoryEntity.setListOfBooks(List.of(bookEntity));
+            categoryEntity.setListOfBooks(listOfBooks);
             listOfCategories.add(categoryEntity);
         }
         bookEntity.setCategoriesList(listOfCategories);
+    }
+
+    public static MvcResult getResultByRequestBody(MockMvc mockMvc, ObjectMapper objectMapper, JWTTokenProvider jwtTokenProvider, HttpMethod httpMethod, String url, UserEntity loggedInUser, Object returnedObject) throws Exception {
+        return switch (httpMethod) {
+            case DELETE -> mockMvc.perform(delete(url)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(returnedObject))
+                            .header(HttpHeaders.AUTHORIZATION, SecurityConstants.TOKEN_PREFIX +
+                                    jwtTokenProvider.generateJwtToken(new UserPrincipal(loggedInUser))))
+                    .andReturn();
+            case POST -> mockMvc.perform(post(url)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(returnedObject))
+                            .header(HttpHeaders.AUTHORIZATION, SecurityConstants.TOKEN_PREFIX +
+                                    jwtTokenProvider.generateJwtToken(new UserPrincipal(loggedInUser))))
+                    .andReturn();
+            case GET -> mockMvc.perform(MockMvcRequestBuilders.get(url)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(returnedObject))
+                            .header(HttpHeaders.AUTHORIZATION, SecurityConstants.TOKEN_PREFIX +
+                                    jwtTokenProvider.generateJwtToken(new UserPrincipal(loggedInUser))))
+                    .andReturn();
+            default -> null;
+        };
+    }
+
+    public static UserEntity getAdmin() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1L);
+        userEntity.setUsername(SuperAdminRoleConstants.ADMIN_USERNAME);
+        userEntity.setEmail(SuperAdminRoleConstants.ADMIN_EMAIL);
+        userEntity.setAuthorities(Role.ROLE_SUPER_ADMIN.getAuthorities());
+        return userEntity;
     }
 }
